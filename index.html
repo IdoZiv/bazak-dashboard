@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Ecosystem Analytics v3 | Bazak</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="page-header">
+        <h1>Bazak.ai - Ecosystem Analytics</h1>
+        <span class="badge-mock">Fattal · Mock data</span>
+      </header>
+
+      <nav class="filter-bar" aria-label="Dashboard filters">
+        <div class="filter-group">
+          <label for="date-range">Date range</label>
+          <select id="date-range">
+            <option value="7">Last 7 days</option>
+            <option value="30" selected>Last 30 days</option>
+            <option value="90">Last 90 days</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="surface-filter">Surface</label>
+          <select id="surface-filter">
+            <option value="all">All</option>
+            <option value="website">Website Agent</option>
+            <option value="chatgpt">ChatGPT App</option>
+            <option value="claude">Claude MCP</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="outcome-filter">Outcome type</label>
+          <select id="outcome-filter">
+            <option value="revenue" selected>Revenue</option>
+            <option value="lead">Lead</option>
+            <option value="booking">Booking</option>
+            <option value="checkout">Checkout hand-off</option>
+          </select>
+        </div>
+        <div class="filter-group highlight">
+          <label for="attribution-filter">Attribution mode</label>
+          <select id="attribution-filter">
+            <option value="last-touch">Last-touch</option>
+            <option value="ai-driven">AI-Driven</option>
+            <option value="comparison" selected>Comparison</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="confidence-filter">Confidence</label>
+          <select id="confidence-filter">
+            <option value="all" selected>All</option>
+            <option value="high">High only</option>
+            <option value="high-medium">High + Medium</option>
+          </select>
+        </div>
+      </nav>
+
+      <section class="kpi-strip" id="kpi-strip" aria-label="Executive KPIs"></section>
+
+      <section class="section" aria-labelledby="journey-heading">
+        <div class="section-header">
+          <div>
+            <h2 id="journey-heading">Customer journey flow</h2>
+            <p class="hint">Ribbon width = journey volume · mock sample data</p>
+          </div>
+          <span id="journey-filter-hint" class="badge-mock" style="display: none; margin: 0">
+            <button type="button" id="clear-journey-filter" style="all: unset; cursor: pointer; margin-left: 8px; opacity: 0.8">✕</button>
+          </span>
+        </div>
+        <div class="section-body sankey-wrap">
+          <div class="sankey-columns" aria-hidden="true">
+            <span>Entry surfaces</span>
+            <span>Journey states</span>
+            <span>Outcomes</span>
+          </div>
+          <div id="sankey-chart" class="mermaid-sankey-host" role="img" aria-label="Sankey diagram of AI customer journeys"></div>
+          <p class="sankey-legend">
+            <span><span class="dot" style="background: #2dd4bf"></span> Entry</span>
+            <span><span class="dot" style="background: #818cf8"></span> Journey</span>
+            <span><span class="dot" style="background: #4ade80"></span> Outcome</span>
+            <span>Ribbon width = volume · color = source node</span>
+          </p>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="table-heading">
+        <div class="section-header">
+          <div>
+            <h2 id="table-heading">Channel contribution by attribution model</h2>
+            <p class="hint">Default sort: AI-Driven Revenue · click a row for diagnostics</p>
+          </div>
+          <div class="table-toolbar">
+            <div class="toggle-group">
+              <button type="button" class="active" data-table-mode="absolute">Absolute</button>
+              <button type="button" data-table-mode="percent">Percentages</button>
+            </div>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="table-scroll">
+            <table>
+              <thead id="channel-table-head"></thead>
+              <tbody id="channel-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="insights-heading">
+        <div class="section-header">
+          <h2 id="insights-heading">Insights &amp; actions</h2>
+        </div>
+        <div class="section-body insights-grid">
+          <div class="insight-panel">
+            <h3><span class="icon">◆</span> Why it&rsquo;s working</h3>
+            <ul class="insight-list" id="insights-working"></ul>
+          </div>
+          <div class="insight-panel">
+            <h3><span class="icon">→</span> What to do next</h3>
+            <ul class="insight-list actions" id="insights-actions"></ul>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="drawer-overlay" class="drawer-overlay" aria-hidden="true">
+      <aside class="drawer" role="dialog" aria-labelledby="drawer-title">
+        <div class="drawer-header">
+          <div>
+            <h2 id="drawer-title">Surface</h2>
+            <p class="role" id="drawer-role"></p>
+          </div>
+          <button type="button" class="drawer-close" id="drawer-close" aria-label="Close panel">×</button>
+        </div>
+        <div class="drawer-section">
+          <h4>Surface summary</h4>
+          <div class="stat-grid" id="drawer-stats"></div>
+        </div>
+        <div class="drawer-section">
+          <h4>Top journeys</h4>
+          <ul id="drawer-journeys"></ul>
+        </div>
+        <div class="drawer-section">
+          <h4>Common user intents</h4>
+          <ul id="drawer-intents"></ul>
+        </div>
+        <div class="drawer-section">
+          <h4>Top drop-off reasons</h4>
+          <ul id="drawer-dropoffs"></ul>
+        </div>
+        <div class="drawer-section">
+          <h4>Guardrail / quality notes</h4>
+          <p class="guardrail-note" id="drawer-guardrail"></p>
+        </div>
+      </aside>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
